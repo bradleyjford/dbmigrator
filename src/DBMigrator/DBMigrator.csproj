@@ -43,21 +43,19 @@
     <Compile Include="FileNameComparer.cs" />
     <Compile Include="ScriptGenerator.cs" />
     <Compile Include="ScriptFileBatchParser.cs" />
-    <Compile Include="SqlClient\Scripts.Designer.cs">
+    <Compile Include="Scripts.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Scripts.resx</DependentUpon>
     </Compile>
+    <Compile Include="TemplateToken.cs" />
     <Compile Include="ScriptWriter.cs" />
-    <Compile Include="SqlClient\BackupCommandHandler.cs" />
-    <Compile Include="SqlClient\GenerateScriptCommand.cs" />
-    <Compile Include="SqlClient\RecreateDatabaseCommandHandler.cs" />
-    <Compile Include="SqlClient\SqlClientCommandHandler.cs" />
-    <Compile Include="SqlClient\SqlConnectionExtensions.cs" />
-    <Compile Include="SqlClient\UpdateDatabaseCommandHandler.cs" />
+    <Compile Include="GenerateScriptCommand.cs" />
+    <Compile Include="SqlConnectionExtensions.cs" />
+    <Compile Include="UpdateDatabaseCommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SqlClient\Scripts.resx">
+    <EmbeddedResource Include="Scripts.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Scripts.Designer.cs</LastGenOutput>
     </EmbeddedResource>

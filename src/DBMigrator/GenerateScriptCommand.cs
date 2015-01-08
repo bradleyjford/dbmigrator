@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DbMigrator.SqlClient
+namespace DbMigrator
 {
     public class GenerateScriptCommand
     {
@@ -21,7 +21,7 @@ namespace DbMigrator.SqlClient
             _fileSystem = fileSystem;
         }
 
-        public void Handle(GenerateScriptCommand command)
+        public void Execute(GenerateScriptCommand command)
         {
             var template = GetTemmplate(command);
 
@@ -39,7 +39,7 @@ namespace DbMigrator.SqlClient
         {
             if (String.IsNullOrEmpty(command.TemplateFilename))
             {
-                return Scripts.Template;
+                return Scripts.ScriptTemplate;
             }
 
             using (var templateStream = _fileSystem.OpenFileReadOnly(command.TemplateFilename))

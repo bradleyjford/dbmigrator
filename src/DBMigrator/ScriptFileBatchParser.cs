@@ -23,14 +23,14 @@ namespace DbMigrator
             _fileSystem = fileSystem;
         }
 
-        public IEnumerable<string> GetScriptBatches(string scriptPath, IDictionary<string, string> arguments)
+        public IEnumerable<string> GetScriptBatches(string filename, IDictionary<string, string> arguments)
         {
             var buffer = new StringBuilder(BufferSize);
 
             var lineNumber = 0;
             var batchStartLineNumber = 0;
 
-            using (var scriptFile = _fileSystem.OpenFile(scriptPath))
+            using (var scriptFile = _fileSystem.OpenFile(filename))
             using (var reader = new StreamReader(scriptFile))
             {
                 while (!reader.EndOfStream)

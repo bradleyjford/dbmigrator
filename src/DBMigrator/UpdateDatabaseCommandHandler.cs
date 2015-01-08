@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace DbMigrator.SqlClient
+namespace DbMigrator
 {
     internal class UpdateDatabaseArguments
     {
-        public string ConnectionString { get; private set; }
+        public string ConnectionString { get; set; }
         public string[] IncludeDirectories { get; set; }
         public Dictionary<string, string> Arguments { get; set; }
 
         public bool Backup { get; set; }
         public string BackupFilename { get; set; }
+
+        public bool RecreateDatabase { get; set; }
     }
 
     internal class UpdateDatabaseCommandHandler
@@ -20,6 +22,7 @@ namespace DbMigrator.SqlClient
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _logger;
         private readonly ScriptFileBatchParser _scriptFileBatchParser;
+        private readonly string _batchTemplate;
 
         public UpdateDatabaseCommandHandler(
             IFileSystem fileSystem,
@@ -29,9 +32,11 @@ namespace DbMigrator.SqlClient
             _logger = logger;
 
             _scriptFileBatchParser = new ScriptFileBatchParser(fileSystem);
+
+            _batchTemplate = Scripts.ScriptBatchTemplate;
         }
 
-        public void Handle(UpdateDatabaseArguments args)
+        public void Execute(UpdateDatabaseArguments args)
         {
             var databaseName = GetDatabaseName(args.ConnectionString);
 
@@ -40,6 +45,16 @@ namespace DbMigrator.SqlClient
                 try
                 {
                     EnterSinlgeUserMode(connection, databaseName);
+
+                    if (args.Backup)
+                    {
+                        CreateBackup(connection, databaseName, args.BackupFilename);
+                    }
+
+                    if (args.RecreateDatabase)
+                    {
+                        RecreateDatabase(connection, databaseName);
+                    }
 
                     using (var transaction = connection.BeginTransaction())
                     {
@@ -66,7 +81,7 @@ namespace DbMigrator.SqlClient
             }
         }
 
-        protected SqlConnection OpenConnection(string connectionString)
+        private SqlConnection OpenConnection(string connectionString)
         {
             var connection = new SqlConnection(connectionString);
 
@@ -85,17 +100,57 @@ namespace DbMigrator.SqlClient
             }
         }
 
+        private void CreateBackup(SqlConnection connection, string databaseName, string filename)
+        {
+            var commandText = String.Format(Scripts.BackupDatabase, databaseName, filename);
+
+            connection.ExecuteNonQueryCommand(commandText);
+        }
+
+        private void RecreateDatabase(SqlConnection connection, string databaseName)
+        {
+            connection.ChangeDatabase("master");
+
+            var commandText = String.Format(Scripts.DropDatabase, databaseName);
+
+            connection.ExecuteNonQueryCommand(commandText);
+
+            commandText = String.Format(Scripts.CreateDatabase, databaseName);
+
+            connection.ExecuteNonQueryCommand(commandText);
+
+            connection.ChangeDatabase(databaseName);
+        }
+
         private void ExecuteUpdateScripts(SqlConnection connection, UpdateDatabaseArguments args)
         {
-            var scriptFiles = _fileSystem.GetScriptFileNames(args.IncludeDirectories).OrderBy(s => s, new FilenameComparer());
+            var scriptFiles = _fileSystem.GetScriptFileNames(args.IncludeDirectories)
+                .OrderBy(s => s, new FilenameComparer());
 
             foreach (var scriptFile in scriptFiles)
             {
+                var batch = 1;
+
                 foreach (var scriptBatch in _scriptFileBatchParser.GetScriptBatches(scriptFile, args.Arguments))
                 {
-                    connection.ExecuteNonQueryCommand(scriptBatch);
+                    var commandText = PrepareBatch(scriptFile, batch, scriptBatch);
+
+                    connection.ExecuteNonQueryCommand(commandText);
+
+                    batch++;
                 }
             }
+        }
+
+        private string PrepareBatch(string filename, int batch, string script)
+        {
+            var result = _batchTemplate;
+
+            result = result.Replace(TemplateToken.Filename, filename);
+            result = result.Replace(TemplateToken.Batch, batch.ToString());
+            result = result.Replace(TemplateToken.Script, script);
+
+            return result;
         }
 
         private void EnterSinlgeUserMode(SqlConnection connection, string databaseName)
@@ -122,15 +177,6 @@ namespace DbMigrator.SqlClient
             var builder = new SqlConnectionStringBuilder(connectionString);
 
             return builder.InitialCatalog;
-        }
-
-        private string GetMasterDatabaseConnectionString(string connectionString)
-        {
-            var builder = new SqlConnectionStringBuilder(connectionString);
-
-            builder.InitialCatalog = "master";
-
-            return builder.ToString();
         }
     }
 }
