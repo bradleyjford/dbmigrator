@@ -4,7 +4,7 @@ using System.IO;
 
 namespace DbMigrator
 {
-    internal class FileNameComparer : IComparer<string>
+    internal class FilenameComparer : IComparer<string>
     {
         public int Compare(string x, string y)
         {

@@ -12,16 +12,16 @@ namespace DbMigrator
         private const string InsertFileToken = "[INSERT FILE]";
         private const string InsertSectionNumberToken = "[INSERT SECTION NUMBER]";
 
-        private readonly StringWriter _writer;
+        private readonly StreamWriter _writer;
         private readonly string _repeatedTemplate;
         private readonly string _template;
         private readonly int _beginLoopIndex;
         private readonly int _endLoopIndex;
 
-        public ScriptWriter(StringWriter writer)
+        public ScriptWriter(StreamWriter writer, string template)
         {
             _writer = writer;
-            _template = Scripts.Template;
+            _template = template;
 
             _beginLoopIndex = _template.IndexOf(BeginLoopToken, StringComparison.Ordinal);
             _endLoopIndex = _template.IndexOf(EndLookToken, StringComparison.Ordinal);

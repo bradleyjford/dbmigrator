@@ -6,12 +6,15 @@ namespace DbMigrator
 {
     internal interface IFileSystem
     {
-        IEnumerable<string> GetScriptFileNames(IEnumerable<string> includeEnvironments);
-        Stream OpenFile(string fileName);
+        IEnumerable<string> GetScriptFileNames(IEnumerable<string> includeSubDirectories);
+        Stream OpenFileReadOnly(string filename);
+        Stream OpenFile(string filename);
     }
 
     internal class FileSystem : IFileSystem
     {
+        private const string ScriptSearchPattern = "*.sql";
+
         private readonly string _basePath;
 
         public FileSystem(string basePath)
@@ -19,27 +22,32 @@ namespace DbMigrator
             _basePath = basePath;
         }
 
-        public IEnumerable<string> GetScriptFileNames(IEnumerable<string> includeEnvironments)
+        public IEnumerable<string> GetScriptFileNames(IEnumerable<string> includeSubDirectories)
         {
-            foreach (var file in Directory.EnumerateFiles(_basePath, "*.sql"))
+            foreach (var file in Directory.EnumerateFiles(_basePath, ScriptSearchPattern))
             {
                 yield return file;
             }
 
-            foreach (var includedEnvironment in includeEnvironments)
+            foreach (var includedEnvironment in includeSubDirectories)
             {
                 var includedPath = Path.Combine(_basePath, includedEnvironment);
 
-                foreach (var file in Directory.EnumerateFiles(includedPath, "*.sql"))
+                foreach (var file in Directory.EnumerateFiles(includedPath, ScriptSearchPattern))
                 {
                     yield return file;
                 }
             }
         }
 
-        public Stream OpenFile(string fileName)
+        public Stream OpenFileReadOnly(string filename)
         {
-            return File.OpenRead(fileName);
+            return File.OpenRead(filename);
+        }
+
+        public Stream OpenFile(string filename)
+        {
+            return File.OpenWrite(filename);
         }
     }
 }

@@ -6,29 +6,47 @@ using System.Text.RegularExpressions;
 
 namespace DbMigrator
 {
-    internal static class ScriptFileBatchParser
+    internal class ScriptFileBatchParser
     {
+        private readonly IFileSystem _fileSystem;
+
         private static readonly Regex BatchTerminatorRegex = 
             new Regex(@"^[\s]*GO[\s]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
-        private const int BufferSize = 4096;
+        private static readonly Regex ParameterRegex =
+            new Regex(@"\$\((?<name>[^)]+)\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public static IEnumerable<string> GetScriptBatches(IFileSystem fileSystem, string scriptPath)
+        private const int BufferSize = 20 * 1024;
+
+        public ScriptFileBatchParser(IFileSystem fileSystem)
+        {
+            _fileSystem = fileSystem;
+        }
+
+        public IEnumerable<string> GetScriptBatches(string scriptPath, IDictionary<string, string> arguments)
         {
             var buffer = new StringBuilder(BufferSize);
 
-            using (var scriptFile = fileSystem.OpenFile(scriptPath))
+            var lineNumber = 0;
+            var batchStartLineNumber = 0;
+
+            using (var scriptFile = _fileSystem.OpenFile(scriptPath))
             using (var reader = new StreamReader(scriptFile))
             {
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
+                    lineNumber++;
 
                     if (BatchTerminatorRegex.IsMatch(line))
                     {
-                        yield return buffer.ToString();
+                        var scriptBatch = Preprocess(buffer.ToString(), arguments);
+
+                        yield return String.Format("LineNo {0} {1}", batchStartLineNumber, scriptBatch);
 
                         buffer.Clear();
+
+                        batchStartLineNumber = lineNumber + 1;
                     }
                     else
                     {
@@ -36,6 +54,22 @@ namespace DbMigrator
                     }
                 }
             }
+        }
+
+        private string Preprocess(string script, IDictionary<string, string> arguments)
+        {
+            foreach (var argument in arguments)
+            {
+                script = script.Replace("$(" + argument.Key + ")", argument.Value);
+            }
+
+            if (ParameterRegex.IsMatch(script))
+            {
+                // TODO: fix exception message
+                throw new Exception("Unresolved script parameter ...");
+            }
+
+            return script;
         }
     }
 }

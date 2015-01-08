@@ -5,11 +5,11 @@ namespace DbMigrator.Tests
 {
     public class ScriptComparerTests
     {
-        private readonly FileNameComparer _comparer;
+        private readonly FilenameComparer _comparer;
 
         public ScriptComparerTests()
         {
-            _comparer = new FileNameComparer();
+            _comparer = new FilenameComparer();
         }
 
         [Fact]

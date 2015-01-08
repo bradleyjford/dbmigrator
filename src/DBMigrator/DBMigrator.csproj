@@ -32,13 +32,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnonymousTypeToDictionaryConverter.cs" />
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="ILogger.cs" />
@@ -46,20 +43,21 @@
     <Compile Include="FileNameComparer.cs" />
     <Compile Include="ScriptGenerator.cs" />
     <Compile Include="ScriptFileBatchParser.cs" />
-    <Compile Include="ScriptPreprocessor.cs" />
-    <Compile Include="Scripts.Designer.cs">
+    <Compile Include="SqlClient\Scripts.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Scripts.resx</DependentUpon>
     </Compile>
     <Compile Include="ScriptWriter.cs" />
     <Compile Include="SqlClient\BackupCommandHandler.cs" />
+    <Compile Include="SqlClient\GenerateScriptCommand.cs" />
     <Compile Include="SqlClient\RecreateDatabaseCommandHandler.cs" />
     <Compile Include="SqlClient\SqlClientCommandHandler.cs" />
+    <Compile Include="SqlClient\SqlConnectionExtensions.cs" />
     <Compile Include="SqlClient\UpdateDatabaseCommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Scripts.resx">
+    <EmbeddedResource Include="SqlClient\Scripts.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Scripts.Designer.cs</LastGenOutput>
     </EmbeddedResource>

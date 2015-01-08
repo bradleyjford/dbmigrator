@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DbMigrator {
+namespace DbMigrator.SqlClient {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DbMigrator {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DbMigrator.Scripts", typeof(Scripts).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DbMigrator.SqlClient.Scripts", typeof(Scripts).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,27 +61,67 @@ namespace DbMigrator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N&apos;[dbo].[__ScriptVersion]&apos;) AND type in (N&apos;U&apos;))
+        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N&apos;[dbo].[_SchemaMigration]&apos;) AND type = N&apos;U&apos;)
         ///BEGIN
         /// 
-        ///	CREATE TABLE dbo.[__ScriptVersion]
+        ///	CREATE TABLE dbo.[_SchemaMigration]
         ///	(
-        ///		[ScriptId]		SMALLINT			NOT NULL IDENTITY (1, 1),
-        ///		[Filename]		NVARCHAR(200)		NOT NULL
+        ///		[SchemaMigrationId]	INT					NOT NULL IDENTITY (1, 1),
+        ///		[Filename]			NVARCHAR(200)		NOT NULL
         ///	)
         /// 
-        ///	ALTER TABLE dbo.[__ScriptVersion] ADD CONSTRAINT [PK_ScriptVersion] PRIMARY KEY CLUSTERED ( [ScriptId] )
+        ///	ALTER TABLE dbo.[_SchemaMigration] ADD CONSTRAINT [PK_SchemaMigration] PRIMARY KEY CLUSTERED ( [SchemaMigrationId] )
+        /// 
+        ///END.
+        /// </summary>
+        internal static string EnsureMigrationTableExists {
+            get {
+                return ResourceManager.GetString("EnsureMigrationTableExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ALTER DAYABASE [{0}] SET MULTI_USER.
+        /// </summary>
+        internal static string SetDatabaseMultiUser {
+            get {
+                return ResourceManager.GetString("SetDatabaseMultiUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ALTER DATABASE [{0}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+        ///ALTER DATABASE [{0}] SET SINGLE_USER.
+        /// </summary>
+        internal static string SetDatabaseSingleUser {
+            get {
+                return ResourceManager.GetString("SetDatabaseSingleUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N&apos;[dbo].[_SchemaMigration]&apos;) AND type = N&apos;U&apos;)
+        ///BEGIN
+        /// 
+        ///	CREATE TABLE dbo.[_SchemaMigration]
+        ///	(
+        ///		[SchemaMigrationId]	INT					NOT NULL IDENTITY (1, 1),
+        ///		[Filename]			NVARCHAR(200)		NOT NULL
+        ///	)
+        /// 
+        ///	ALTER TABLE dbo.[_SchemaMigration] ADD CONSTRAINT [PK_SchemaMigration] PRIMARY KEY CLUSTERED ( [SchemaMigrationId] )
         /// 
         ///END
-        /// 
+        ///
+        ///SET XACT_ABORT ON
+        ///
         ///BEGIN TRANSACTION
-        ///DECLARE @Result NVARCHAR(MAX)
         /// 
         ///BEGIN TRY
         /// 
-        ///[BEGIN LOOP]
-        /// 
-        ///	IF NOT EXISTS (SELECT * FROM dbo.[__Script [rest of string was truncated]&quot;;.
+        ///	[BEGIN LOOP]
+        ///	 
+        ///		IF NOT EXISTS (SELECT * FROM [dbo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Template {
             get {

@@ -7,44 +7,40 @@ namespace DbMigrator
     internal class ScriptGenerator
     {
         private readonly IFileSystem _fileSystem;
-        private readonly IEnumerable<string> _includeEnvironments;
-        private readonly IDictionary<string, string> _arguments;
+        private readonly ScriptFileBatchParser _scriptBatchParser;
 
-        public ScriptGenerator(
-            IFileSystem fileSystem, 
-            IEnumerable<string> includeEnvironments,
-            IDictionary<string, string> arguments)
+        public ScriptGenerator(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _includeEnvironments = includeEnvironments;
-            _arguments = arguments;
+            _scriptBatchParser = new ScriptFileBatchParser(fileSystem);
         }
 
-        public void Run(ScriptWriter scriptWriter)
+        public void Run(
+            ScriptWriter scriptWriter, 
+            IEnumerable<string> environments, 
+            IDictionary<string, string> arguments)
         {
-            var scriptPaths = _fileSystem.GetScriptFileNames(_includeEnvironments)
-                .OrderBy(s => s, new FileNameComparer());
+            var scriptFilenames = _fileSystem.GetScriptFileNames(environments)
+                .OrderBy(s => s, new FilenameComparer());
 
             scriptWriter.WriteHeader();
 
-            foreach (var scriptPath in scriptPaths)
+            foreach (var filename in scriptFilenames)
             {
-                ProcessScript(scriptPath, scriptWriter);
+                ProcessScriptFile(scriptWriter, filename, arguments);
             }
 
             scriptWriter.WriteFooter();
         }
 
-        private void ProcessScript(string scriptPath, ScriptWriter scriptWriter)
+        private void ProcessScriptFile(ScriptWriter scriptWriter, string filename, IDictionary<string, string> arguments)
         {
             var batchNumber = 1;
-            var scriptBatches = ScriptFileBatchParser.GetScriptBatches(_fileSystem, scriptPath);
+            var scriptBatches = _scriptBatchParser.GetScriptBatches(filename, arguments);
 
             foreach (var scriptBatch in scriptBatches)
             {
-                var batch = ScriptPreprocessor.Process(scriptBatch, _arguments);
-
-                scriptWriter.WriteScript(scriptPath, batchNumber++, batch);
+                scriptWriter.WriteScript(filename, batchNumber++, scriptBatch);
             }
         }
     }

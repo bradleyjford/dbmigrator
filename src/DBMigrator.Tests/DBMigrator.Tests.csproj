@@ -51,7 +51,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DBMigrator\DBMigrator.csproj">
       <Project>{a2930990-e321-445f-9829-c05584aad853}</Project>
-      <Name>Mambo</Name>
+      <Name>DBMigrator</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

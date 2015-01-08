@@ -117,51 +117,75 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Template" xml:space="preserve">
-    <value>IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[__ScriptVersion]') AND type in (N'U'))
+  <data name="EnsureMigrationTableExists" xml:space="preserve">
+    <value>IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_SchemaMigration]') AND type = N'U')
 BEGIN
  
-	CREATE TABLE dbo.[__ScriptVersion]
+	CREATE TABLE dbo.[_SchemaMigration]
 	(
-		[ScriptId]		SMALLINT			NOT NULL IDENTITY (1, 1),
-		[Filename]		NVARCHAR(200)		NOT NULL
+		[SchemaMigrationId]	INT					NOT NULL IDENTITY (1, 1),
+		[Filename]			NVARCHAR(200)		NOT NULL
 	)
  
-	ALTER TABLE dbo.[__ScriptVersion] ADD CONSTRAINT [PK_ScriptVersion] PRIMARY KEY CLUSTERED ( [ScriptId] )
+	ALTER TABLE dbo.[_SchemaMigration] ADD CONSTRAINT [PK_SchemaMigration] PRIMARY KEY CLUSTERED ( [SchemaMigrationId] )
+ 
+END</value>
+  </data>
+  <data name="SetDatabaseMultiUser" xml:space="preserve">
+    <value>ALTER DAYABASE [{0}] SET MULTI_USER</value>
+  </data>
+  <data name="SetDatabaseSingleUser" xml:space="preserve">
+    <value>ALTER DATABASE [{0}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+ALTER DATABASE [{0}] SET SINGLE_USER</value>
+  </data>
+  <data name="Template" xml:space="preserve">
+    <value>IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[_SchemaMigration]') AND type = N'U')
+BEGIN
+ 
+	CREATE TABLE dbo.[_SchemaMigration]
+	(
+		[SchemaMigrationId]	INT					NOT NULL IDENTITY (1, 1),
+		[Filename]			NVARCHAR(200)		NOT NULL
+	)
+ 
+	ALTER TABLE dbo.[_SchemaMigration] ADD CONSTRAINT [PK_SchemaMigration] PRIMARY KEY CLUSTERED ( [SchemaMigrationId] )
  
 END
- 
+
+SET XACT_ABORT ON
+
 BEGIN TRANSACTION
-DECLARE @Result NVARCHAR(MAX)
  
 BEGIN TRY
  
-[BEGIN LOOP]
- 
-	IF NOT EXISTS (SELECT * FROM dbo.[__ScriptVersion] WHERE [Filename] = '[INSERT FILENAME];[INSERT SECTION NUMBER]') 
-	BEGIN
-         
-         EXECUTE('[INSERT FILE]')
- 
-         SET NOCOUNT ON
-         INSERT INTO dbo.[__ScriptVersion] VALUES ('[INSERT FILENAME];[INSERT SECTION NUMBER]')
- 
-         SET @Result = 'Succesfully upgraded database through script ''[INSERT FILENAME];[INSERT SECTION NUMBER]''.'
-         
-         PRINT @Result
- 
-	END
- 
-[END LOOP]
- 
-PRINT 'Database is up to date.'
+	[BEGIN LOOP]
+	 
+		IF NOT EXISTS (SELECT * FROM [dbo].[_SchemaMigration] WHERE [Filename] = '[INSERT FILENAME];[INSERT SECTION NUMBER]') 
+		BEGIN
+	         
+	         EXECUTE('[INSERT FILE]')
+	 
+	         SET NOCOUNT ON
+	         INSERT INTO dbo.[_SchemaMigration] VALUES ('[INSERT FILENAME];[INSERT SECTION NUMBER]')
+	 
+	         PRINT 'Successfully applied script ''[INSERT FILENAME];[INSERT SECTION NUMBER]''.'
+	          
+		END
+	 
+	[END LOOP]
+	 
+	PRINT 'Database is up to date.'
  
 END TRY
 BEGIN CATCH
+
 	DECLARE @ErrorMessage NVARCHAR(MAX)
+
 	SET @ErrorMessage = 'ERROR:  An error was encountered during the upgrade. All changes have been rolled back.' + CHAR(13) + ErrorMessage() + '(Line: ' + CONVERT(VARCHAR(10), ERROR_LINE()) + ')'
+	
 	ROLLBACK TRAN
     RAISERROR (@ErrorMessage, 15, 1, '')
+
 END CATCH;       
  
 IF @@TRANCOUNT &gt; 0 COMMIT TRAN</value>
