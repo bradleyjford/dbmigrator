@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
-    internal interface ILogger
+    public interface ILogger
     {
         void Error(string format, params object[] values);
         void Warn(string format, params object[] values);

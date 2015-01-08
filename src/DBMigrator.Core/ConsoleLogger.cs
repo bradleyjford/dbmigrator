@@ -1,40 +1,42 @@
 ﻿using System;
 using System.IO;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
-    internal class ConsoleLogger : ILogger
+    public class ConsoleLogger : ILogger
     {
         private readonly TextWriter _errorWriter;
+        private readonly TextWriter _writer;
 
         public ConsoleLogger()
         {
             _errorWriter = Console.Error;
+            _writer = Console.Out;
         }
 
         public void Error(string format, params object[] values)
         {
-            _errorWriter.WriteLine(format, values);
+            WriteLine(_errorWriter, ConsoleColor.Red, format, values);
         }
 
-        private void WriteLine(ConsoleColor color, string format, object[] values)
+        private void WriteLine(TextWriter wrtier, ConsoleColor color, string format, object[] values)
         {
             var originalColor = Console.ForegroundColor;
 
             Console.ForegroundColor = color;
-            Console.WriteLine(format, values);
+            wrtier.WriteLine(format, values);
 
             Console.ForegroundColor = originalColor;
         }
 
         public void Warn(string format, params object[] values)
         {
-            WriteLine(ConsoleColor.Yellow, format, values);
+            WriteLine(_writer, ConsoleColor.Yellow, format, values);
         }
 
         public void Info(string format, params object[] values)
         {
-            WriteLine(ConsoleColor.Gray, format, values);
+            WriteLine(_writer, ConsoleColor.Gray, format, values);
         }
     }
 }

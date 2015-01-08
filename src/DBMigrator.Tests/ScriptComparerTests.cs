@@ -1,4 +1,5 @@
 ﻿using System;
+using DbMigrator.Core;
 using Xunit;
 
 namespace DbMigrator.Tests

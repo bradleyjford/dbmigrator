@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
     internal static class SqlConnectionExtensions
     {

@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
-    internal interface IFileSystem
+    public interface IFileSystem
     {
         IEnumerable<string> GetScriptFileNames(IEnumerable<string> includeSubDirectories);
         Stream OpenFileReadOnly(string filename);
         Stream OpenFile(string filename);
     }
 
-    internal class FileSystem : IFileSystem
+    public class FileSystem : IFileSystem
     {
         private const string ScriptSearchPattern = "*.sql";
 

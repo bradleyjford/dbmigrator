@@ -5,10 +5,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("dbmig")]
-[assembly: AssemblyDescription("Command line database migration tool for Microsoft SQL Server")]
+[assembly: AssemblyTitle("DBMigrator.Core")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Bradley Ford")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("dbmig")]
 [assembly: AssemblyCopyright("Copyright © Bradley Ford 2015")]
 [assembly: AssemblyTrademark("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2e67f7a0-25ca-4552-80c7-d15308f30e63")]
+[assembly: Guid("8049189a-aa59-4b4c-bf01-70d04ec91423")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,3 +34,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+[assembly: InternalsVisibleTo("DbMigrator.Tests")]

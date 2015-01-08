@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
     /// Based on http://blogs.msdn.com/b/danhardan/archive/2007/03/30/database-change-scripts-mambo-style.aspx
     internal class ScriptWriter

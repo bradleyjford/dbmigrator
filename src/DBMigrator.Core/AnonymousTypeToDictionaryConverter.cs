@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
     internal static class AnonymousTypeToDictionaryConverter
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
     internal static class TemplateToken
     {

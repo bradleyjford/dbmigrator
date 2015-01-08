@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
     internal class ScriptGenerator
     {
@@ -15,7 +15,7 @@ namespace DbMigrator
             _scriptBatchParser = new ScriptFileBatchParser(fileSystem);
         }
 
-        public void Run(
+        public void Generate(
             ScriptWriter scriptWriter, 
             IEnumerable<string> environments, 
             IDictionary<string, string> arguments)

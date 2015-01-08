@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
     internal class FilenameComparer : IComparer<string>
     {

@@ -3,28 +3,16 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace DbMigrator
+namespace DbMigrator.Core
 {
-    internal class UpdateDatabaseArguments
-    {
-        public string ConnectionString { get; set; }
-        public string[] IncludeDirectories { get; set; }
-        public Dictionary<string, string> Arguments { get; set; }
-
-        public bool Backup { get; set; }
-        public string BackupFilename { get; set; }
-
-        public bool RecreateDatabase { get; set; }
-    }
-
-    internal class UpdateDatabaseCommandHandler
+    public class DatabaseUpgradeHandler
     {
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _logger;
         private readonly ScriptFileBatchParser _scriptFileBatchParser;
         private readonly string _batchTemplate;
 
-        public UpdateDatabaseCommandHandler(
+        public DatabaseUpgradeHandler(
             IFileSystem fileSystem,
             ILogger logger)
         {
@@ -36,22 +24,28 @@ namespace DbMigrator
             _batchTemplate = Scripts.ScriptBatchTemplate;
         }
 
-        public void Execute(UpdateDatabaseArguments args)
+        public void Execute(
+            string connectionString, 
+            IEnumerable<string> includeDirectories, 
+            Dictionary<string, string> arguments, 
+            bool backup, 
+            string backupFilename, 
+            bool recreateDatabase )
         {
-            var databaseName = GetDatabaseName(args.ConnectionString);
+            var databaseName = GetDatabaseName(connectionString);
 
-            using (var connection = OpenConnection(args.ConnectionString))
+            using (var connection = OpenConnection(connectionString))
             {
                 try
                 {
                     EnterSinlgeUserMode(connection, databaseName);
 
-                    if (args.Backup)
+                    if (backup)
                     {
-                        CreateBackup(connection, databaseName, args.BackupFilename);
+                        CreateBackup(connection, databaseName, backupFilename);
                     }
 
-                    if (args.RecreateDatabase)
+                    if (recreateDatabase)
                     {
                         RecreateDatabase(connection, databaseName);
                     }
@@ -62,7 +56,7 @@ namespace DbMigrator
                         {
                             EnsureSchemaMigrationTableExists(connection);
 
-                            ExecuteUpdateScripts(connection, args);
+                            ExecuteUpdateScripts(connection, includeDirectories, arguments);
 
                             transaction.Commit();
                         }
@@ -122,16 +116,19 @@ namespace DbMigrator
             connection.ChangeDatabase(databaseName);
         }
 
-        private void ExecuteUpdateScripts(SqlConnection connection, UpdateDatabaseArguments args)
+        private void ExecuteUpdateScripts(
+            SqlConnection connection,
+            IEnumerable<string> includeDirectories,
+            Dictionary<string, string> arguments)
         {
-            var scriptFiles = _fileSystem.GetScriptFileNames(args.IncludeDirectories)
+            var scriptFiles = _fileSystem.GetScriptFileNames(includeDirectories)
                 .OrderBy(s => s, new FilenameComparer());
 
             foreach (var scriptFile in scriptFiles)
             {
                 var batch = 1;
 
-                foreach (var scriptBatch in _scriptFileBatchParser.GetScriptBatches(scriptFile, args.Arguments))
+                foreach (var scriptBatch in _scriptFileBatchParser.GetScriptBatches(scriptFile, arguments))
                 {
                     var commandText = PrepareBatch(scriptFile, batch, scriptBatch);
 

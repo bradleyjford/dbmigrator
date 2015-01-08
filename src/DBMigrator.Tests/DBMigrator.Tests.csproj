@@ -49,9 +49,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DBMigrator\DBMigrator.csproj">
+    <ProjectReference Include="..\DBMigrator.Core\DBMigrator.Core.csproj">
       <Project>{a2930990-e321-445f-9829-c05584aad853}</Project>
-      <Name>DBMigrator</Name>
+      <Name>DBMigrator.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
