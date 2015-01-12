@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 
 namespace DbMigrator.Core
@@ -26,6 +27,7 @@ namespace DbMigrator.Core
 
         public void Execute(
             string connectionString, 
+            string basePath,
             IEnumerable<string> includeDirectories, 
             Dictionary<string, string> arguments, 
             bool backup, 
@@ -54,17 +56,17 @@ namespace DbMigrator.Core
                     {
                         try
                         {
-                            EnsureSchemaMigrationTableExists(connection);
+                            EnsureSchemaMigrationTableExists(connection, transaction);
 
-                            ExecuteUpdateScripts(connection, includeDirectories, arguments);
+                            ExecuteUpdateScripts(connection, transaction, basePath, includeDirectories, arguments);
 
                             transaction.Commit();
                         }
-                        catch (Exception ex)
+                        catch (SqlException ex)
                         {
                             transaction.Rollback();
 
-                            _logger.Error(ex.Message);
+                            _logger.Error("Line {0}: {1}", ex.LineNumber, ex.Message);
                         }
                     }
                 }
@@ -90,7 +92,7 @@ namespace DbMigrator.Core
         {
             foreach (SqlError error in e.Errors)
             {
-                _logger.Info("Line {0}: {1}", error.LineNumber, error.Message);
+                _logger.Info(error.Message);
             }
         }
 
@@ -118,21 +120,25 @@ namespace DbMigrator.Core
 
         private void ExecuteUpdateScripts(
             SqlConnection connection,
+            SqlTransaction transaction,
+            string basePath,
             IEnumerable<string> includeDirectories,
             Dictionary<string, string> arguments)
         {
-            var scriptFiles = _fileSystem.GetScriptFileNames(includeDirectories)
+            var scriptFiles = _fileSystem.GetScriptFileNames(basePath, includeDirectories)
                 .OrderBy(s => s, new FilenameComparer());
 
             foreach (var scriptFile in scriptFiles)
             {
                 var batch = 1;
 
+                var normalizedFilename = Path.GetFileNameWithoutExtension(scriptFile);
+
                 foreach (var scriptBatch in _scriptFileBatchParser.GetScriptBatches(scriptFile, arguments))
                 {
-                    var commandText = PrepareBatch(scriptFile, batch, scriptBatch);
+                    var commandText = PrepareBatch(normalizedFilename, batch, scriptBatch);
 
-                    connection.ExecuteNonQueryCommand(commandText);
+                    connection.ExecuteNonQueryCommand(commandText, transaction: transaction);
 
                     batch++;
                 }
@@ -164,9 +170,9 @@ namespace DbMigrator.Core
             connection.ExecuteNonQueryCommand(commandText);
         }
 
-        private void EnsureSchemaMigrationTableExists(SqlConnection connection)
+        private void EnsureSchemaMigrationTableExists(SqlConnection connection, SqlTransaction transaction)
         {
-            connection.ExecuteNonQueryCommand(Scripts.EnsureMigrationTableExists);
+            connection.ExecuteNonQueryCommand(Scripts.EnsureMigrationTableExists, transaction: transaction);
         }
 
         private string GetDatabaseName(string connectionString)

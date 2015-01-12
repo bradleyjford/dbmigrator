@@ -1,5 +1,7 @@
 ﻿using System;
-
+using System.Linq;
+using CommandLine;
+using CommandLine.Text;
 using CommandLineParser = CommandLine.Parser;
 
 namespace DBMigrator
@@ -8,26 +10,26 @@ namespace DBMigrator
     {
         static void Main(string[] args)
         {
-            var options = new Options();
-
-            var invokedVerb = "script";
-            CommandLineVerb invokedVerbOptions = null;
-
-            if (!CommandLineParser.Default.ParseArgumentsStrict(args, options, (v, o) =>
+            var parserResult = CommandLineParser.Default.ParseArguments(args, typeof(GenerateScriptVerb), typeof(UpgradeDatabaseVerb));
+            
+            if (parserResult.Errors.Any())
             {
-                invokedVerb = v;
-                invokedVerbOptions = (CommandLineVerb)o;
-            }))
-            {
-                Environment.Exit(CommandLineParser.DefaultExitCodeFail);
+                Environment.Exit(-1);
             }
 
-            if (invokedVerbOptions == null)
-            {
-                Environment.Exit(CommandLineParser.DefaultExitCodeFail);
-            }
+            WriteLogo(parserResult);
 
-            invokedVerbOptions.Execute();
+            var handler = (IVerbHandler)parserResult.Value;
+
+            handler.Execute();
+        }
+
+        static void WriteLogo<T>(ParserResult<T> parserResult)
+        {
+            var helpText = HelpText.AutoBuild(parserResult);
+
+            Console.WriteLine("{0}{2}{1}{2}", helpText.Heading, helpText.Copyright, Environment.NewLine);
+
         }
     }
 }

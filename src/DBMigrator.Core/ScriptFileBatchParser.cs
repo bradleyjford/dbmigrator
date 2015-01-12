@@ -30,7 +30,7 @@ namespace DbMigrator.Core
             var lineNumber = 0;
             var batchStartLineNumber = 0;
 
-            using (var scriptFile = _fileSystem.OpenFile(filename))
+            using (var scriptFile = _fileSystem.OpenFileReadOnly(filename))
             using (var reader = new StreamReader(scriptFile))
             {
                 while (!reader.EndOfStream)
@@ -42,7 +42,7 @@ namespace DbMigrator.Core
                     {
                         var scriptBatch = Preprocess(buffer.ToString(), arguments);
 
-                        yield return String.Format("LineNo {0} {1}", batchStartLineNumber, scriptBatch);
+                        yield return String.Format("LineNo {0} EXECUTE('{1}')", batchStartLineNumber, scriptBatch);
 
                         buffer.Clear();
 
@@ -62,6 +62,8 @@ namespace DbMigrator.Core
             {
                 script = script.Replace("$(" + argument.Key + ")", argument.Value);
             }
+
+            script = script.Replace("'", "''");
 
             if (ParameterRegex.IsMatch(script))
             {

@@ -116,7 +116,7 @@ namespace DbMigrator.Core {
         /// <summary>
         ///   Looks up a localized string similar to IF NOT EXISTS (SELECT 1 FROM dbo._SchemaMigration WHERE Filename = &apos;[FILE];[BATCH]&apos;) 
         ///	BEGIN
-        ///         EXECUTE(&apos;[SCRIPT]&apos;)
+        ///         [SCRIPT]
         /// 
         ///         SET NOCOUNT ON
         ///         INSERT dbo._SchemaMigration VALUES (&apos;[FILE];[BATCH]&apos;)
@@ -160,7 +160,7 @@ namespace DbMigrator.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ALTER DAYABASE [{0}] SET MULTI_USER.
+        ///   Looks up a localized string similar to ALTER DATABASE [{0}] SET MULTI_USER.
         /// </summary>
         internal static string SetDatabaseMultiUser {
             get {

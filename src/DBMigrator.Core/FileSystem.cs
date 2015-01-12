@@ -6,7 +6,7 @@ namespace DbMigrator.Core
 {
     public interface IFileSystem
     {
-        IEnumerable<string> GetScriptFileNames(IEnumerable<string> includeSubDirectories);
+        IEnumerable<string> GetScriptFileNames(string basePath, IEnumerable<string> includeDirectories);
         Stream OpenFileReadOnly(string filename);
         Stream OpenFile(string filename);
     }
@@ -15,25 +15,16 @@ namespace DbMigrator.Core
     {
         private const string ScriptSearchPattern = "*.sql";
 
-        private readonly string _basePath;
-
-        public FileSystem(string basePath)
+        public IEnumerable<string> GetScriptFileNames(string basePath, IEnumerable<string> includeDirectories)
         {
-            _basePath = basePath;
-        }
-
-        public IEnumerable<string> GetScriptFileNames(IEnumerable<string> includeSubDirectories)
-        {
-            foreach (var file in Directory.EnumerateFiles(_basePath, ScriptSearchPattern))
+            foreach (var file in Directory.EnumerateFiles(basePath, ScriptSearchPattern))
             {
                 yield return file;
             }
 
-            foreach (var includedEnvironment in includeSubDirectories)
+            foreach (var includeDirectory in includeDirectories)
             {
-                var includedPath = Path.Combine(_basePath, includedEnvironment);
-
-                foreach (var file in Directory.EnumerateFiles(includedPath, ScriptSearchPattern))
+                foreach (var file in Directory.EnumerateFiles(includeDirectory, ScriptSearchPattern))
                 {
                     yield return file;
                 }

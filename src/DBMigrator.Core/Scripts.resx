@@ -149,7 +149,7 @@ END</value>
   <data name="ScriptBatchTemplate" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT 1 FROM dbo._SchemaMigration WHERE Filename = '[FILE];[BATCH]') 
 	BEGIN
-         EXECUTE('[SCRIPT]')
+         [SCRIPT]
  
          SET NOCOUNT ON
          INSERT dbo._SchemaMigration VALUES ('[FILE];[BATCH]')
@@ -180,7 +180,7 @@ BEGIN TRY
 	[BEGIN LOOP]
 	IF NOT EXISTS (SELECT 1 FROM dbo._SchemaMigration WHERE Filename = '[FILE];[BATCH]') 
 	BEGIN
-         EXECUTE('[SCRIPT]')
+         [SCRIPT]
  
          SET NOCOUNT ON
          INSERT dbo._SchemaMigration VALUES ('[FILE];[BATCH]')
@@ -195,7 +195,7 @@ END TRY
 BEGIN CATCH
 	DECLARE @ErrorMessage NVARCHAR(MAX)
 
-	SET @ErrorMessage = 'ERROR: An error occured during the upgrade. All changes have been rolled back.' + CHAR(13) + ErrorMessage() + '(Line: ' + CONVERT(VARCHAR(10), ERROR_LINE()) + ')'
+	SET @ErrorMessage = 'ERROR: An error occured during the upgrade. All changes have been rolled back.' + CHAR(13) + ERROR_MESSAGE() + '(Line: ' + CONVERT(VARCHAR(10), ERROR_LINE()) + ')'
 	
 	ROLLBACK TRAN
 	RAISERROR(@ErrorMessage, 15, 1, '')
@@ -204,7 +204,7 @@ END CATCH;
 IF @@TRANCOUNT &gt; 0 COMMIT TRAN</value>
   </data>
   <data name="SetDatabaseMultiUser" xml:space="preserve">
-    <value>ALTER DAYABASE [{0}] SET MULTI_USER</value>
+    <value>ALTER DATABASE [{0}] SET MULTI_USER</value>
   </data>
   <data name="SetDatabaseSingleUser" xml:space="preserve">
     <value>ALTER DATABASE [{0}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE

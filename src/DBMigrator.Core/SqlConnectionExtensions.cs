@@ -5,9 +5,11 @@ namespace DbMigrator.Core
 {
     internal static class SqlConnectionExtensions
     {
-        public static SqlCommand CreateCommand(this SqlConnection connection, string commandText, object arguments = null)
+        public static SqlCommand CreateCommand(this SqlConnection connection, string commandText, object arguments = null, SqlTransaction transaction = null)
         {
             var command = connection.CreateCommand();
+
+            command.Transaction = transaction;
 
             command.CommandText = commandText;
 
@@ -24,9 +26,9 @@ namespace DbMigrator.Core
             return command;
         }
 
-        public static int ExecuteNonQueryCommand(this SqlConnection connection, string commandText, object arguments = null)
+        public static int ExecuteNonQueryCommand(this SqlConnection connection, string commandText, object arguments = null, SqlTransaction transaction = null)
         {
-            using (var command = CreateCommand(connection, commandText, arguments))
+            using (var command = CreateCommand(connection, commandText, arguments, transaction))
             {
                 return command.ExecuteNonQuery();
             }
