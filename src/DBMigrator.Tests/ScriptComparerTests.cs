@@ -19,7 +19,7 @@ namespace DbMigrator.Tests
             var x = "Z\\0001 Script 1.sql";
             var y = "A\\2 Script 2.sql";
 
-            Assert.Equal(-1, _comparer.Compare(x, y));
+            Assert.True(_comparer.Compare(x, y) < 0);
         }
     }
 }

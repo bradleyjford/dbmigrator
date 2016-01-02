@@ -148,14 +148,13 @@ END</value>
   </data>
   <data name="ScriptBatchTemplate" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT 1 FROM dbo._SchemaMigration WHERE Filename = '[FILE];[BATCH]') 
-	BEGIN
-         [SCRIPT]
- 
-         SET NOCOUNT ON
-         INSERT dbo._SchemaMigration VALUES ('[FILE];[BATCH]')
- 
-         PRINT 'Successfully applied script ''[FILE];[BATCH]''.'
-	END</value>
+BEGIN
+PRINT 'Applying script ''[FILE];[BATCH]''...'
+	[SCRIPT] 
+
+	SET NOCOUNT ON
+	INSERT dbo._SchemaMigration VALUES ('[FILE];[BATCH]')
+END</value>
   </data>
   <data name="ScriptTemplate" xml:space="preserve">
     <value>IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo._SchemaMigration') AND type = N'U')
@@ -180,12 +179,11 @@ BEGIN TRY
 	[BEGIN LOOP]
 	IF NOT EXISTS (SELECT 1 FROM dbo._SchemaMigration WHERE Filename = '[FILE];[BATCH]') 
 	BEGIN
+         PRINT 'Applying script ''[FILE];[BATCH]''...'
          [SCRIPT]
  
          SET NOCOUNT ON
          INSERT dbo._SchemaMigration VALUES ('[FILE];[BATCH]')
- 
-         PRINT 'Successfully applied script ''[FILE];[BATCH]''.'
 	END	 
 	[END LOOP]
 	 

@@ -29,7 +29,6 @@ namespace DBMigrator
             var helpText = HelpText.AutoBuild(parserResult);
 
             Console.WriteLine("{0}{2}{1}{2}", helpText.Heading, helpText.Copyright, Environment.NewLine);
-
         }
     }
 }

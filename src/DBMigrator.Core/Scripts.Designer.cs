@@ -115,14 +115,13 @@ namespace DbMigrator.Core {
         
         /// <summary>
         ///   Looks up a localized string similar to IF NOT EXISTS (SELECT 1 FROM dbo._SchemaMigration WHERE Filename = &apos;[FILE];[BATCH]&apos;) 
-        ///	BEGIN
-        ///         [SCRIPT]
-        /// 
-        ///         SET NOCOUNT ON
-        ///         INSERT dbo._SchemaMigration VALUES (&apos;[FILE];[BATCH]&apos;)
-        /// 
-        ///         PRINT &apos;Successfully applied script &apos;&apos;[FILE];[BATCH]&apos;&apos;.&apos;
-        ///	END.
+        ///BEGIN
+        ///PRINT &apos;Applying script &apos;&apos;[FILE];[BATCH]&apos;&apos;...&apos;
+        ///	[SCRIPT] 
+        ///
+        ///	SET NOCOUNT ON
+        ///	INSERT dbo._SchemaMigration VALUES (&apos;[FILE];[BATCH]&apos;)
+        ///END.
         /// </summary>
         internal static string ScriptBatchTemplate {
             get {

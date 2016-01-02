@@ -51,7 +51,7 @@
     </Compile>
     <Compile Include="TemplateToken.cs" />
     <Compile Include="ScriptWriter.cs" />
-    <Compile Include="GenerateScriptHandler.cs" />
+    <Compile Include="ScriptGenerationHandler.cs" />
     <Compile Include="SqlConnectionExtensions.cs" />
     <Compile Include="DatabaseUpgradeHandler.cs" />
   </ItemGroup>

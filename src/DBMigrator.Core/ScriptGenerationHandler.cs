@@ -4,12 +4,12 @@ using System.IO;
 
 namespace DbMigrator.Core
 {
-    public class GenerateScriptHandler
+    public class ScriptGenerationHandler
     {
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _logger;
 
-        public GenerateScriptHandler(IFileSystem fileSystem, ILogger logger)
+        public ScriptGenerationHandler(IFileSystem fileSystem, ILogger logger)
         {
             _fileSystem = fileSystem;
             _logger = logger;

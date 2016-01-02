@@ -52,7 +52,7 @@ namespace DbMigrator.Core
                 scriptWriter.WriteScript(filename, batchNumber++, scriptBatch);
             }
 
-            return batchNumber;
+            return batchNumber - 1;
         }
     }
 }

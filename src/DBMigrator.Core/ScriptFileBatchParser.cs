@@ -33,6 +33,8 @@ namespace DbMigrator.Core
             using (var scriptFile = _fileSystem.OpenFileReadOnly(filename))
             using (var reader = new StreamReader(scriptFile))
             {
+                string scriptBatch;
+
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
@@ -40,9 +42,9 @@ namespace DbMigrator.Core
 
                     if (BatchTerminatorRegex.IsMatch(line))
                     {
-                        var scriptBatch = Preprocess(buffer.ToString(), arguments);
+                        scriptBatch = Preprocess(buffer.ToString(), arguments);
 
-                        yield return String.Format("LineNo {0} EXECUTE('{1}')", batchStartLineNumber, scriptBatch);
+                        yield return String.Format("EXECUTE('{1}')", batchStartLineNumber, scriptBatch);
 
                         buffer.Clear();
 
@@ -52,6 +54,13 @@ namespace DbMigrator.Core
                     {
                         buffer.AppendLine(line);
                     }
+                }
+
+                if (buffer.ToString().Trim().Length > 0)
+                {
+                    scriptBatch = Preprocess(buffer.ToString(), arguments);
+
+                    yield return String.Format("EXECUTE('{1}')", batchStartLineNumber, scriptBatch);
                 }
             }
         }
@@ -63,15 +72,15 @@ namespace DbMigrator.Core
                 script = script.Replace("$(" + argument.Key + ")", argument.Value);
             }
 
-            script = script.Replace("'", "''");
-
             if (ParameterRegex.IsMatch(script))
             {
                 // TODO: fix exception message
                 throw new Exception("Unresolved script parameter ...");
             }
 
-            return script;
+            script = script.Replace("'", "''");
+
+            return script.TrimEnd();
         }
     }
 }

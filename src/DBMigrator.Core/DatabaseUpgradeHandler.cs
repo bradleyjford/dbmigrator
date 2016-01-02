@@ -38,10 +38,10 @@ namespace DbMigrator.Core
 
             using (var connection = OpenConnection(connectionString))
             {
+                EnterSinlgeUserMode(connection, databaseName);
+
                 try
                 {
-                    EnterSinlgeUserMode(connection, databaseName);
-
                     if (backup)
                     {
                         CreateBackup(connection, databaseName, backupFilename);

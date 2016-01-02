@@ -31,7 +31,7 @@ namespace DBMigrator
             var logger = new ConsoleLogger(Verbose);
 
             var fileSystem = new FileSystem();
-            var handler = new GenerateScriptHandler(fileSystem, logger);
+            var handler = new ScriptGenerationHandler(fileSystem, logger);
             
             var arguments = ParseParameters(Parameters);
 
