@@ -1,12 +1,12 @@
 ﻿using System;
-using DbMigrator.Core;
+using DBMigrator.Core;
 using Xunit;
 
-namespace DbMigrator.Tests
+namespace DBMigrator.Tests
 {
     public class ScriptComparerTests
     {
-        private readonly FilenameComparer _comparer;
+        readonly FilenameComparer _comparer;
 
         public ScriptComparerTests()
         {

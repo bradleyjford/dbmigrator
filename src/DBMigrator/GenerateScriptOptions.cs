@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommandLine;
-using DbMigrator.Core;
+using DBMigrator.Core;
 
 namespace DBMigrator
 {
@@ -14,31 +14,33 @@ namespace DBMigrator
         [Option('d', "base-dir", Required = true, HelpText = "Directory containing the migration scripts.")]
         public string BaseDirectory { get; set; }
 
-        [Option('i', "include-dir", Min = 0, Max = 50, HelpText = "Include the migrations from the specified directories.")]
-        public IEnumerable<string> IncludeDirectories { get; set; } 
+        [Option('i', "include-dir", HelpText = "Include the migrations from the specified directories.")]
+        public ICollection<string> IncludeDirectories { get; set; } 
 
-        [Option('p', "params", Min = 0, Max = 100, HelpText = "Parameters that will be replaced in the generated script. Each variable must be specified in the format name=value with no spaces.")]
+        [Option('p', "params", HelpText = "Parameters that will be replaced in the generated script. Each variable must be specified in the format name=value with no spaces.")]
         public IEnumerable<string> Parameters { get; set; }
 
         [Option('t', "template-file", Required = false, HelpText = "Filename of the template that will be used to generate the script.")]
         public string TemplateFilename { get; set; }
 
-        [Option('v', "--verbose", DefaultValue = false, HelpText = "Enables verbose logging.")]
+        [Option('v', "--verbose", Default = false, HelpText = "Enables verbose logging.")]
         public bool Verbose { get; set; }
 
-        public void Execute()
+        public int Execute()
         {
             var logger = new ConsoleLogger(Verbose);
 
-            var fileSystem = new FileSystem();
+            var fileSystem = new FileSystem("*.sql");
             var handler = new ScriptGenerationHandler(fileSystem, logger);
             
             var arguments = ParseParameters(Parameters);
 
             handler.Execute(OutputFilename, BaseDirectory, IncludeDirectories, arguments, TemplateFilename);
+
+            return 0;
         }
 
-        private Dictionary<string, string> ParseParameters(IEnumerable<string> parameters)
+        Dictionary<string, string> ParseParameters(IEnumerable<string> parameters)
         {
             var result = new Dictionary<string, string>();
 

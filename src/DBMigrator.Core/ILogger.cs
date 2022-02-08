@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
     public interface ILogger
     {

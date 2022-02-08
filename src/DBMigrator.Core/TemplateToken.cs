@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
-    internal static class TemplateToken
+    static class TemplateToken
     {
         public const string Filename = "[FILE]";
         public const string Script = "[SCRIPT]";

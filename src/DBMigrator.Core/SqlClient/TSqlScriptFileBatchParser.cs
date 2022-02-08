@@ -4,21 +4,25 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
-    internal class ScriptFileBatchParser
+    public class TSqlScriptFileBatchParser : IScriptFileBatchParser
     {
-        private readonly IFileSystem _fileSystem;
+        readonly IFileSystem _fileSystem;
 
-        private static readonly Regex BatchTerminatorRegex = 
-            new Regex(@"^[\s]*GO[\s]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+        static readonly Regex BatchTerminatorRegex = new Regex(
+            @"^[\s]*GO[;\s]*$", 
+            RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline, 
+            TimeSpan.FromSeconds(2));
 
-        private static readonly Regex ParameterRegex =
-            new Regex(@"\$\((?<name>[^)]+)\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        static readonly Regex ParameterRegex = new Regex(
+            @"\$\((?<name>[^)]+)\)", 
+            RegexOptions.Compiled | RegexOptions.IgnoreCase,
+            TimeSpan.FromSeconds(2));
 
-        private const int BufferSize = 20 * 1024;
+        const int BufferSize = 20 * 1024;
 
-        public ScriptFileBatchParser(IFileSystem fileSystem)
+        public TSqlScriptFileBatchParser(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
         }
@@ -44,7 +48,7 @@ namespace DbMigrator.Core
                     {
                         scriptBatch = Preprocess(buffer.ToString(), arguments);
 
-                        yield return String.Format("EXECUTE('{1}')", batchStartLineNumber, scriptBatch);
+                        yield return String.Format($"LINENO {batchStartLineNumber}{Environment.NewLine}EXECUTE('{scriptBatch}')");
 
                         buffer.Clear();
 
@@ -60,7 +64,7 @@ namespace DbMigrator.Core
                 {
                     scriptBatch = Preprocess(buffer.ToString(), arguments);
 
-                    yield return String.Format("EXECUTE('{1}')", batchStartLineNumber, scriptBatch);
+                    yield return String.Format($"LINENO {batchStartLineNumber}{Environment.NewLine}EXECUTE('{scriptBatch}')");
                 }
             }
         }

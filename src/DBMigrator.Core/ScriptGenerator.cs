@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
-    internal class ScriptGenerator
+    class ScriptGenerator
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly ILogger _logger;
-        private readonly ScriptFileBatchParser _scriptBatchParser;
+        readonly IFileSystem _fileSystem;
+        readonly ILogger _logger;
+        readonly TSqlScriptFileBatchParser _scriptBatchParser;
 
         public ScriptGenerator(IFileSystem fileSystem, ILogger logger)
         {
             _fileSystem = fileSystem;
             _logger = logger;
 
-            _scriptBatchParser = new ScriptFileBatchParser(fileSystem);
+            _scriptBatchParser = new TSqlScriptFileBatchParser(fileSystem);
         }
 
         public void Generate(
             ScriptWriter scriptWriter,
             string basePath,
-            IEnumerable<string> includeDirectories, 
+            ICollection<string> includeDirectories, 
             IDictionary<string, string> arguments)
         {
             var scriptFilenames = _fileSystem.GetScriptFileNames(basePath, includeDirectories)
@@ -34,13 +34,13 @@ namespace DbMigrator.Core
             {
                 var batchCount = ProcessScriptFile(scriptWriter, filename, arguments);
 
-                _logger.Verbose("Merged {0} batch(es) from file \"{1}\"", batchCount, filename);
+                _logger.Verbose($"Merged {batchCount} batch(es) from file \"{filename}\"");
             }
 
             scriptWriter.WriteFooter();
         }
 
-        private int ProcessScriptFile(ScriptWriter scriptWriter, string filename, IDictionary<string, string> arguments)
+        int ProcessScriptFile(ScriptWriter scriptWriter, string filename, IDictionary<string, string> arguments)
         {
             var batchNumber = 1;
             var scriptBatches = _scriptBatchParser.GetScriptBatches(filename, arguments);

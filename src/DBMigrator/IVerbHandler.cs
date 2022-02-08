@@ -4,6 +4,6 @@ namespace DBMigrator
 {
     interface IVerbHandler
     {
-        void Execute();
+        int Execute();
     }
 }

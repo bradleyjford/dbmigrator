@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
     public class ScriptGenerationHandler
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly ILogger _logger;
+        readonly IFileSystem _fileSystem;
+        readonly ILogger _logger;
 
         public ScriptGenerationHandler(IFileSystem fileSystem, ILogger logger)
         {
@@ -18,7 +18,7 @@ namespace DbMigrator.Core
         public void Execute(
             string outputFilename, 
             string basePath, 
-            IEnumerable<string> includeDirectories, 
+            ICollection<string> includeDirectories, 
             Dictionary<string, string> arguments, 
             string templateFilename)
         {
@@ -42,34 +42,34 @@ namespace DbMigrator.Core
             LogEndInfo();
         }
 
-        private void LogBeginInfo(string outputFilename, string basePath, IEnumerable<string> includeDirectories)
+        void LogBeginInfo(string outputFilename, string basePath, IEnumerable<string> includeDirectories)
         {
-            _logger.Info("Generating script \"{0}\" from migrations contained in the following directories:", outputFilename);
+            _logger.Info($"Generating script \"{outputFilename}\" from migrations contained in the following directories:");
 
-            _logger.Info("    {0}", basePath);
+            _logger.Info($"    {basePath}");
 
             foreach (var includedDirectory in includeDirectories)
             {
-                _logger.Info("    {0}", includedDirectory);
+                _logger.Info($"    {includedDirectory}");
             }
 
             _logger.Info("");
         }
 
-        private void LogEndInfo()
+        void LogEndInfo()
         {
             _logger.Verbose("");
             _logger.Info("Done.");
         }
 
-        private void EnsurePathsValid(string outputFilename, string basePath, IEnumerable<string> includeDirectories)
+        void EnsurePathsValid(string outputFilename, string basePath, IEnumerable<string> includeDirectories)
         {
             // Normalise paths and compare 
 
             // Throw exception if outputFilename is within the basePath or any of the included directories.
         }
 
-        private string GetTemplate(string filename)
+        string GetTemplate(string filename)
         {
             if (String.IsNullOrEmpty(filename))
             {

@@ -4,23 +4,24 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
     public class DatabaseUpgradeHandler
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly ILogger _logger;
-        private readonly ScriptFileBatchParser _scriptFileBatchParser;
-        private readonly string _batchTemplate;
+        readonly IFileSystem _fileSystem;
+        readonly ILogger _logger;
+        readonly IScriptFileBatchParser _scriptFileBatchParser;
+        readonly string _batchTemplate;
 
         public DatabaseUpgradeHandler(
             IFileSystem fileSystem,
+            IScriptFileBatchParser scriptBatchParser,
             ILogger logger)
         {
             _fileSystem = fileSystem;
             _logger = logger;
 
-            _scriptFileBatchParser = new ScriptFileBatchParser(fileSystem);
+            _scriptFileBatchParser = scriptBatchParser;
 
             _batchTemplate = Scripts.ScriptBatchTemplate;
         }
@@ -38,7 +39,7 @@ namespace DbMigrator.Core
 
             using (var connection = OpenConnection(connectionString))
             {
-                EnterSinlgeUserMode(connection, databaseName);
+                EnterSingleUserMode(connection, databaseName);
 
                 try
                 {
@@ -66,7 +67,7 @@ namespace DbMigrator.Core
                         {
                             transaction.Rollback();
 
-                            _logger.Error("Line {0}: {1}", ex.LineNumber, ex.Message);
+                            _logger.Error($"Line {ex.LineNumber}: {ex.Message}");
                         }
                     }
                 }
@@ -77,7 +78,7 @@ namespace DbMigrator.Core
             }
         }
 
-        private SqlConnection OpenConnection(string connectionString)
+        SqlConnection OpenConnection(string connectionString)
         {
             var connection = new SqlConnection(connectionString);
 
@@ -88,7 +89,7 @@ namespace DbMigrator.Core
             return connection;
         }
 
-        private void OnInfoMessageReceived(object sender, SqlInfoMessageEventArgs e)
+        void OnInfoMessageReceived(object sender, SqlInfoMessageEventArgs e)
         {
             foreach (SqlError error in e.Errors)
             {
@@ -96,14 +97,14 @@ namespace DbMigrator.Core
             }
         }
 
-        private void CreateBackup(SqlConnection connection, string databaseName, string filename)
+        void CreateBackup(SqlConnection connection, string databaseName, string filename)
         {
             var commandText = String.Format(Scripts.BackupDatabase, databaseName, filename);
 
             connection.ExecuteNonQueryCommand(commandText);
         }
 
-        private void RecreateDatabase(SqlConnection connection, string databaseName)
+        void RecreateDatabase(SqlConnection connection, string databaseName)
         {
             connection.ChangeDatabase("master");
 
@@ -118,7 +119,7 @@ namespace DbMigrator.Core
             connection.ChangeDatabase(databaseName);
         }
 
-        private void ExecuteUpdateScripts(
+        void ExecuteUpdateScripts(
             SqlConnection connection,
             SqlTransaction transaction,
             string basePath,
@@ -145,7 +146,7 @@ namespace DbMigrator.Core
             }
         }
 
-        private string PrepareBatch(string filename, int batch, string script)
+        string PrepareBatch(string filename, int batch, string script)
         {
             var result = _batchTemplate;
 
@@ -156,26 +157,26 @@ namespace DbMigrator.Core
             return result;
         }
 
-        private void EnterSinlgeUserMode(SqlConnection connection, string databaseName)
+        void EnterSingleUserMode(SqlConnection connection, string databaseName)
         {
             var commandText = String.Format(Scripts.SetDatabaseSingleUser, databaseName);
 
             connection.ExecuteNonQueryCommand(commandText);
         }
 
-        private void ExitSingleUserMode(SqlConnection connection, string databaseName)
+        void ExitSingleUserMode(SqlConnection connection, string databaseName)
         {
             var commandText = String.Format(Scripts.SetDatabaseMultiUser, databaseName);
 
             connection.ExecuteNonQueryCommand(commandText);
         }
 
-        private void EnsureSchemaMigrationTableExists(SqlConnection connection, SqlTransaction transaction)
+        void EnsureSchemaMigrationTableExists(SqlConnection connection, SqlTransaction transaction)
         {
             connection.ExecuteNonQueryCommand(Scripts.EnsureMigrationTableExists, transaction: transaction);
         }
 
-        private string GetDatabaseName(string connectionString)
+        string GetDatabaseName(string connectionString)
         {
             var builder = new SqlConnectionStringBuilder(connectionString);
 

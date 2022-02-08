@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
     public class ConsoleLogger : ILogger
     {
-        private readonly bool _verbose;
-        private readonly TextWriter _errorWriter;
-        private readonly TextWriter _writer;
+        readonly bool _verbose;
+        readonly TextWriter _errorWriter;
+        readonly TextWriter _writer;
 
         public ConsoleLogger(bool verbose)
         {
@@ -22,12 +22,12 @@ namespace DbMigrator.Core
             WriteLine(_errorWriter, ConsoleColor.Red, format, values);
         }
 
-        private void WriteLine(TextWriter wrtier, ConsoleColor color, string format, object[] values)
+        void WriteLine(TextWriter writer, ConsoleColor color, string format, object[] values)
         {
             var originalColor = Console.ForegroundColor;
 
             Console.ForegroundColor = color;
-            wrtier.WriteLine(format, values);
+            writer.WriteLine(format, values);
 
             Console.ForegroundColor = originalColor;
         }

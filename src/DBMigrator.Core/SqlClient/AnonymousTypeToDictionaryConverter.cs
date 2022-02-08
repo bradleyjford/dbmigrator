@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core.SqlClient
 {
-    internal static class AnonymousTypeToDictionaryConverter
+    static class AnonymousTypeToDictionaryConverter
     {
         public static IDictionary<string, object> Convert(object values)
         {

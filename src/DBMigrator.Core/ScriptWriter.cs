@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
     /// Based on http://blogs.msdn.com/b/danhardan/archive/2007/03/30/database-change-scripts-mambo-style.aspx
-    internal class ScriptWriter
+    class ScriptWriter
     {
-        private readonly StreamWriter _writer;
-        private readonly string _repeatedTemplate;
-        private readonly string _template;
-        private readonly int _beginLoopIndex;
-        private readonly int _endLoopIndex;
+        readonly StreamWriter _writer;
+        readonly string _repeatedTemplate;
+        readonly string _template;
+        readonly int _beginLoopIndex;
+        readonly int _endLoopIndex;
 
         public ScriptWriter(StreamWriter writer, string template)
         {
@@ -20,7 +20,8 @@ namespace DbMigrator.Core
             _beginLoopIndex = _template.IndexOf(TemplateToken.BeginLoop, StringComparison.Ordinal);
             _endLoopIndex = _template.IndexOf(TemplateToken.EndLoop, StringComparison.Ordinal);
 
-            _repeatedTemplate = _template.Substring(_beginLoopIndex + TemplateToken.BeginLoop.Length,
+            _repeatedTemplate = _template.Substring(
+                _beginLoopIndex + TemplateToken.BeginLoop.Length,
                 _endLoopIndex - _beginLoopIndex - TemplateToken.BeginLoop.Length);
         }
         

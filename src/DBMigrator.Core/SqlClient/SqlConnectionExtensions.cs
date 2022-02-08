@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Data.SqlClient;
+using DBMigrator.Core.SqlClient;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
-    internal static class SqlConnectionExtensions
+    static class SqlConnectionExtensions
     {
-        public static SqlCommand CreateCommand(this SqlConnection connection, string commandText, object arguments = null, SqlTransaction transaction = null)
+        public static SqlCommand CreateCommand(
+            this SqlConnection connection, 
+            string commandText, 
+            object arguments = null, 
+            SqlTransaction transaction = null)
         {
             var command = connection.CreateCommand();
 
@@ -26,7 +31,11 @@ namespace DbMigrator.Core
             return command;
         }
 
-        public static int ExecuteNonQueryCommand(this SqlConnection connection, string commandText, object arguments = null, SqlTransaction transaction = null)
+        public static int ExecuteNonQueryCommand(
+            this SqlConnection connection, 
+            string commandText, 
+            object arguments = null, 
+            SqlTransaction transaction = null)
         {
             using (var command = CreateCommand(connection, commandText, arguments, transaction))
             {

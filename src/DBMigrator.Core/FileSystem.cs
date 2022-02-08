@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DbMigrator.Core
+namespace DBMigrator.Core
 {
     public interface IFileSystem
     {
@@ -13,18 +13,23 @@ namespace DbMigrator.Core
 
     public class FileSystem : IFileSystem
     {
-        private const string ScriptSearchPattern = "*.sql";
+        readonly string _fileSpec;
+
+        public FileSystem(string fileSpec)
+        {
+            _fileSpec = fileSpec;
+        }
 
         public IEnumerable<string> GetScriptFileNames(string basePath, IEnumerable<string> includeDirectories)
         {
-            foreach (var file in Directory.EnumerateFiles(basePath, ScriptSearchPattern))
+            foreach (var file in Directory.EnumerateFiles(basePath, _fileSpec))
             {
                 yield return file;
             }
 
             foreach (var includeDirectory in includeDirectories)
             {
-                foreach (var file in Directory.EnumerateFiles(includeDirectory, ScriptSearchPattern))
+                foreach (var file in Directory.EnumerateFiles(includeDirectory, _fileSpec))
                 {
                     yield return file;
                 }

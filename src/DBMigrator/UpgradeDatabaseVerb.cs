@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommandLine;
-using DbMigrator.Core;
+using DBMigrator.Core;
 
 namespace DBMigrator
 {
@@ -14,30 +14,30 @@ namespace DBMigrator
         [Option('c', "connection-string", Required = true, HelpText = "Connection string used to connect to the database.")]
         public string ConnectionString { get; set; }
 
-        [Option('i', "include-dir", Min = 0, Max = 50, HelpText = "Include the migrations from the specified directories.")]
+        [Option('i', "include-dir", HelpText = "Include the migrations from the specified directories.")]
         public IEnumerable<string> IncludeDirectories { get; set; }
 
-        [Option('b', "backup", Required = false, DefaultValue = false, HelpText = "Create a database backup prior to applying any migrations.")]
+        [Option('b', "backup", Required = false, Default = false, HelpText = "Create a database backup prior to applying any migrations.")]
         public bool BackupDatabase { get; set; }
 
         [Option('f', "backup-file", Required = false, HelpText = "Path and filename of the database backup that will be created.")]
         public string BackupFilename { get; set; }
 
-        [Option('r', "recreate-database", Required = false, DefaultValue = false, HelpText = "Drop and recreate the database rather than upgrading.")]
+        [Option('r', "recreate-database", Required = false, Default = false, HelpText = "Drop and recreate the database rather than upgrading.")]
         public bool RecreateDatabase { get; set; }
 
         [Option('p', "params", Required = false, HelpText = "Parameters that will be replaced in the generated script. Each variable must be specified in the format name=value with no spaces.")]
         public IEnumerable<string> Variables { get; set; }
 
-        [Option('v', "--verbose", DefaultValue = false, HelpText = "Enables verbose logging.")]
+        [Option('v', "--verbose", Default = false, HelpText = "Enables verbose logging.")]
         public bool Verbose { get; set; }
 
-        public void Execute()
+        public int Execute()
         {
             var logger = new ConsoleLogger(Verbose);
 
-            var fileSystem = new FileSystem();
-            var handler = new DatabaseUpgradeHandler(fileSystem, logger);
+            var fileSystem = new FileSystem("*.sql");
+            var handler = new DatabaseUpgradeHandler(fileSystem, new TSqlScriptFileBatchParser(fileSystem), logger);
 
             var arguments = ParseParameters(Variables);
 
@@ -48,6 +48,8 @@ namespace DBMigrator
                 arguments, BackupDatabase, 
                 BackupFilename, 
                 RecreateDatabase);
+
+            return 0;
         }
 
         protected Dictionary<string, string> ParseParameters(IEnumerable<string> parameters)
