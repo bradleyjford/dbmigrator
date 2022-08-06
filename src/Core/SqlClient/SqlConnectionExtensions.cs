@@ -4,26 +4,14 @@ namespace DbMigrator.Core.SqlClient;
 
 static class SqlConnectionExtensions
 {
-    public static SqlCommand CreateCommand(
-        this SqlConnection connection, 
-        string commandText, 
-        object? arguments = null, 
+    public static SqlCommand CreateCommand(this SqlConnection connection,
+        string commandText,
         SqlTransaction? transaction = null)
     {
         var command = connection.CreateCommand();
 
         command.Transaction = transaction;
         command.CommandText = commandText;
-
-        if (arguments != null)
-        {
-            var argumentDictionary = AnonymousTypeToDictionaryConverter.Convert(arguments);
-
-            foreach (var pair in argumentDictionary)
-            {
-                command.Parameters.AddWithValue(pair.Key, pair.Value);
-            }
-        }
 
         return command;
     }
@@ -34,7 +22,7 @@ static class SqlConnectionExtensions
         object? arguments = null, 
         SqlTransaction? transaction = null)
     {
-        using var command = CreateCommand(connection, commandText, arguments, transaction);
+        using var command = CreateCommand(connection, commandText, transaction);
             
         return await command.ExecuteNonQueryAsync();
     }

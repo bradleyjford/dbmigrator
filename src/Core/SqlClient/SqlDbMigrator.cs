@@ -40,7 +40,7 @@ public class SqlDbMigrator : IDbMigrator
         await _connection.ExecuteNonQueryCommandAsync(Scripts.EnsureMigrationTableExists, transaction: _transaction);
     }
 
-    public async Task ApplyMigrationAsync(string migrationText)
+    public async Task ApplyMigrationAsync(string filename, string migrationText)
     {
         try
         {
@@ -49,7 +49,7 @@ public class SqlDbMigrator : IDbMigrator
         catch (SqlException ex)
         {
             _logger.Error($"Line {ex.LineNumber}: {ex.Message}");
-            throw ex;
+            throw new DbMigrationException(filename, ex.LineNumber, "An error occured applying data migration", ex);
         }
     }
 

@@ -4,7 +4,7 @@ using DbMigrator.Core;
 namespace DbMigrator.Cli;
 
 [Verb("script", HelpText = "Generates a SQL script from the included migrations.")]
-class GenerateScriptVerb : IVerbHandler
+class GenerateScriptVerb
 {
     public GenerateScriptVerb(
         string outputFilename, 

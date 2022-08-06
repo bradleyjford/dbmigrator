@@ -45,12 +45,11 @@ public sealed class MsSqlScriptFileBatchParser : IScriptFileBatchParser
 
             if (BatchTerminatorRegex.IsMatch(line!))
             {
-                scriptBatch = buffer.ToString().TrimEnd();
+                scriptBatch = buffer.ToString().Trim();
 
                 if (scriptBatch.Length > 0)
                 {
-                    scriptBatch = SubstituteArguments(scriptBatch, arguments);
-                    scriptBatch = ApplyBatchTemplate(filename, batchNumber, scriptBatch);
+                    scriptBatch = ApplyBatchTemplate(filename, batchNumber, scriptBatch, arguments);
 
                     yield return string.Format($"LINENO {batchStartLineNumber}{Environment.NewLine}EXECUTE('{scriptBatch}')");
                 }
@@ -66,17 +65,29 @@ public sealed class MsSqlScriptFileBatchParser : IScriptFileBatchParser
             }
         }
 
-        scriptBatch = buffer.ToString().TrimEnd();
+        scriptBatch = buffer.ToString().Trim();
                 
         if (scriptBatch.Length > 0)
         {
-            scriptBatch = SubstituteArguments(scriptBatch, arguments);
-            scriptBatch = ApplyBatchTemplate(filename, batchNumber, scriptBatch);
+            scriptBatch = ApplyBatchTemplate(filename, batchNumber, scriptBatch, arguments);
 
             yield return string.Format($"LINENO {batchStartLineNumber}{Environment.NewLine}EXECUTE('{scriptBatch}')");
         }
     }
 
+    string ApplyBatchTemplate(string filename, int batch, string script, IDictionary<string, string> arguments)
+    {
+        script = SubstituteArguments(script, arguments);
+
+        var result = Scripts.ScriptBatchTemplate;
+
+        result = result.Replace(TemplateToken.Filename, filename);
+        result = result.Replace(TemplateToken.Batch, batch.ToString());
+        result = result.Replace(TemplateToken.Script, script);
+
+        return result;
+    }
+    
     string SubstituteArguments(string script, IDictionary<string, string> arguments)
     {
         foreach (var argument in arguments)
@@ -91,16 +102,5 @@ public sealed class MsSqlScriptFileBatchParser : IScriptFileBatchParser
         }
 
         return script.Replace("'", "''");
-    }
-        
-    string ApplyBatchTemplate(string filename, int batch, string script)
-    {
-        var result = Scripts.ScriptBatchTemplate;
-
-        result = result.Replace(TemplateToken.Filename, filename);
-        result = result.Replace(TemplateToken.Batch, batch.ToString());
-        result = result.Replace(TemplateToken.Script, script);
-
-        return result;
     }
 }

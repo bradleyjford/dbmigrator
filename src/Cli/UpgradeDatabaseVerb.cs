@@ -6,7 +6,7 @@ using DbMigrator.Core.SqlClient;
 namespace DbMigrator.Cli;
 
 [Verb("upgrade", HelpText = "Applies the included migrations to the specified database.")]
-class UpgradeDatabaseVerb : IVerbHandler
+class UpgradeDatabaseVerb
 {
     public UpgradeDatabaseVerb(
         string baseDirectory, 

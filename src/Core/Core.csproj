@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>DbMigrator.Core</RootNamespace>
     <AssemblyName>DbMigrator.Core</AssemblyName>
+    <RootNamespace>DbMigrator.Core</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <PackageId>DbMigrator</PackageId>
+    <PackageId>Entr.DbMigrator</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +19,12 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>DbMigrator.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
   <ItemGroup>
     <EmbeddedResource Update="SqlClient\Scripts.resx">
       <Generator>ResXFileCodeGenerator</Generator>

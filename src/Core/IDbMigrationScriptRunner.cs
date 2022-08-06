@@ -5,5 +5,5 @@ public interface IDbMigrator : IDisposable
     Task CommitAsync();
     Task RollbackAsync();
     Task EnsureSchemaMigrationTableExistsAsync();
-    Task ApplyMigrationAsync(string migrationText);
+    Task ApplyMigrationAsync(string filename, string migrationScript);
 }

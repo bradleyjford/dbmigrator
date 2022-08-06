@@ -71,12 +71,12 @@ public class DatabaseUpgradeHandler
         
     async Task ExecuteMigrationScriptAsync(
         IDbMigrator migrator,
-        string scriptFile,
+        string scriptFilename,
         IDictionary<string, string> arguments)
     {
-        await foreach (var scriptBatch in _scriptFileBatchParser.GetScriptBatches(scriptFile, arguments))
+        await foreach (var scriptBatch in _scriptFileBatchParser.GetScriptBatches(scriptFilename, arguments))
         {
-            await migrator.ApplyMigrationAsync(scriptBatch); 
+            await migrator.ApplyMigrationAsync(scriptFilename, scriptBatch); 
         }
     }
 }
