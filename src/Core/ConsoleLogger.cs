@@ -2,7 +2,7 @@
 
 namespace DbMigrator.Core;
 
-public class ConsoleLogger : ILogger
+public sealed class ConsoleLogger : ILogger
 {
     readonly bool _verbose;
     readonly TextWriter _errorWriter;

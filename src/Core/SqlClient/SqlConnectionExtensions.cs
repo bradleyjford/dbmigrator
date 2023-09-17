@@ -22,7 +22,7 @@ static class SqlConnectionExtensions
         object? arguments = null, 
         SqlTransaction? transaction = null)
     {
-        using var command = CreateCommand(connection, commandText, transaction);
+        await using var command = CreateCommand(connection, commandText, transaction);
             
         return await command.ExecuteNonQueryAsync();
     }

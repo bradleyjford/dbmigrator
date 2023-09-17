@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System.Collections.Immutable;
+using CommandLine;
 using DbMigrator.Core;
 
 namespace DbMigrator.Cli;
@@ -65,9 +66,9 @@ class GenerateScriptVerb
         return 0;
     }
 
-    Dictionary<string, string> ParseParameters(IEnumerable<string> parameters)
+    ImmutableDictionary<string, string> ParseParameters(IEnumerable<string> parameters)
     {
-        var result = new Dictionary<string, string>();
+        var result = ImmutableDictionary.CreateBuilder<string, string>();
 
         foreach (var param in parameters)
         {
@@ -76,6 +77,6 @@ class GenerateScriptVerb
             result.Add(parts[0], parts[1]);
         }
 
-        return result;
+        return result.ToImmutable();
     }
 }

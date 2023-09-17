@@ -12,8 +12,6 @@ public interface IFileSystem
 
 public sealed class FileSystem : IFileSystem
 {
-    static readonly IComparer<string> MigrationFilenameComparer = new MigrationScriptFilenameComparer();
-
     readonly string _fileSpec;
 
     public FileSystem(string fileSpec)
@@ -24,7 +22,7 @@ public sealed class FileSystem : IFileSystem
     public ImmutableArray<string> GetMigrationScripts(string basePath, string[] includeDirectories)
     {
         return EnumerateFiles(basePath, includeDirectories)
-            .OrderBy(s => s, MigrationFilenameComparer)
+            .OrderBy(s => s, MigrationScriptFilenameComparer.Instance)
             .ToImmutableArray();
     }
 

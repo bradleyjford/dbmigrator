@@ -121,10 +121,13 @@
     <value>BACKUP DATABASE [{0}] TO DISK = '{1}'</value>
   </data>
   <data name="CreateDatabase" xml:space="preserve">
-    <value>CREATE DATABASE [{0}]</value>
+    <value>IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'{0}')
+BEGIN
+    CREATE DATABASE [{0}]
+END</value>
   </data>
   <data name="DropDatabase" xml:space="preserve">
-    <value>IF  EXISTS (SELECT name FROM sys.databases WHERE name = N'{0}')
+    <value>IF EXISTS (SELECT name FROM sys.databases WHERE name = N'{0}')
 BEGIN
     ALTER DATABASE [{0}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
     ALTER DATABASE [{0}] SET SINGLE_USER

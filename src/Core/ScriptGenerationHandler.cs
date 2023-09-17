@@ -18,7 +18,7 @@ public sealed class ScriptGenerationHandler
         string outputFilename, 
         string basePath, 
         string[] includeDirectories, 
-        Dictionary<string, string> arguments, 
+        IDictionary<string, string> arguments, 
         string templateFilename)
     {
         LogBeginInfo(outputFilename, basePath, includeDirectories);
@@ -27,8 +27,8 @@ public sealed class ScriptGenerationHandler
 
         var template = await GetTemplate(templateFilename);
 
-        using (var stream = _fileSystem.OpenFile(outputFilename))
-        using (var streamWriter = new StreamWriter(stream))
+        await using (var stream = _fileSystem.OpenFile(outputFilename))
+        await using (var streamWriter = new StreamWriter(stream))
         {
             var scriptWriter = new ScriptWriter(streamWriter, template);
             var scriptGenerator = new ScriptGenerator(_fileSystem, _logger);

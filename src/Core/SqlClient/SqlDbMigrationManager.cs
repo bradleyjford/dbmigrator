@@ -12,30 +12,28 @@ sealed class SqlDbMigrationManager : IDbMigrationManager
 
     SqlConnection _connection = default!;
 
-    public static async Task<SqlDbMigrationManager> CreateAsync(string connectionString, ILogger logger)
+    public static async Task<SqlDbMigrationManager> CreateAsync(string connectionString, string databaseName, ILogger logger)
     {
-        var result = new SqlDbMigrationManager(connectionString, logger);
+        var result = new SqlDbMigrationManager(connectionString, databaseName, logger);
 
         await result.OpenConnectionAsync();
+        await result.EnsureDatabaseExistsAsync();
         await result.EnterSingleUserModeAsync();
 
         return result;
     }
     
-    SqlDbMigrationManager(string connectionString, ILogger logger)
+    SqlDbMigrationManager(string connectionString, string databaseName, ILogger logger)
     {
         _connectionString = connectionString;
+        _databaseName = databaseName;
         _logger = logger;
-
-        _databaseName = GetDatabaseName(connectionString);
     }
 
     public async ValueTask DisposeAsync()
     {
         await ExitSingleUserModeAsync().ConfigureAwait(false);
         await _connection.CloseAsync().ConfigureAwait(false);
-
-        GC.SuppressFinalize(this);
     }
     
     public IDbMigrator CreateMigrator()
@@ -66,6 +64,16 @@ sealed class SqlDbMigrationManager : IDbMigrationManager
         await _connection!.ExecuteNonQueryCommandAsync(commandText);
     }
 
+    public async Task EnsureDatabaseExistsAsync()
+    {
+        _connection!.ChangeDatabase(MasterDatabaseName);
+
+        var commandText = string.Format(Scripts.CreateDatabase, _databaseName);
+        await _connection.ExecuteNonQueryCommandAsync(commandText);
+
+        _connection.ChangeDatabase(_databaseName);
+    }
+    
     public async Task RecreateDatabaseAsync()
     {
         _connection!.ChangeDatabase(MasterDatabaseName);
@@ -75,8 +83,6 @@ sealed class SqlDbMigrationManager : IDbMigrationManager
 
         commandText = string.Format(Scripts.CreateDatabase, _databaseName);
         await _connection.ExecuteNonQueryCommandAsync(commandText);
-
-        _connection.ChangeDatabase(_databaseName);
     }
         
     async Task EnterSingleUserModeAsync()

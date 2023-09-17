@@ -20,7 +20,8 @@ public class DatabaseUpgradeHandler
     }
 
     public async Task Execute(
-        string connectionString, 
+        string connectionString,
+        string databaseName,
         string basePath,
         string[] includeDirectories, 
         IDictionary<string, string> arguments, 
@@ -28,7 +29,7 @@ public class DatabaseUpgradeHandler
         string backupFilename, 
         bool recreateDatabase)
     { 
-        await using var migrator = await SqlDbMigrationManager.CreateAsync(connectionString, _logger);
+        await using var migrator = await SqlDbMigrationManager.CreateAsync(connectionString, databaseName, _logger);
         
         if (backup)
         {
@@ -44,7 +45,7 @@ public class DatabaseUpgradeHandler
         
         try
         {
-            await runner.EnsureSchemaMigrationTableExistsAsync();
+            await runner.PrepareAsync();
             await ExecuteUpdateScriptsAsync(runner, basePath, includeDirectories, arguments);
 
             await runner.CommitAsync();

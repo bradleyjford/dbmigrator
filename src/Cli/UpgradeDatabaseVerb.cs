@@ -9,7 +9,8 @@ namespace DbMigrator.Cli;
 class UpgradeDatabaseVerb
 {
     public UpgradeDatabaseVerb(
-        string baseDirectory, 
+        string baseDirectory,
+        string databaseName,
         string connectionString, 
         IEnumerable<string> includeDirectories, 
         bool backupDatabase, 
@@ -19,6 +20,7 @@ class UpgradeDatabaseVerb
         bool verbose)
     {
         BaseDirectory = baseDirectory;
+        DatabaseName = databaseName;
         ConnectionString = connectionString;
         IncludeDirectories = includeDirectories;
         BackupDatabase = backupDatabase;
@@ -35,6 +37,10 @@ class UpgradeDatabaseVerb
     [Option('c', "connection-string", Required = true,
         HelpText = "Connection string used to connect to the database.")]
     public string ConnectionString { get; }
+
+    [Option('n', "database-name", Required = true,
+        HelpText = "Name of the database to be migrated.")]
+    public string DatabaseName { get; }
 
     [Option('i', "include-dir",
         HelpText = "Include the migrations from the specified directories.")]
@@ -70,6 +76,7 @@ class UpgradeDatabaseVerb
 
         await handler.Execute(
             ConnectionString, 
+            DatabaseName,
             BaseDirectory, 
             IncludeDirectories.ToArray(), 
             arguments,

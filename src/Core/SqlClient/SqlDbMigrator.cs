@@ -2,7 +2,7 @@ using Microsoft.Data.SqlClient;
 
 namespace DbMigrator.Core.SqlClient;
 
-public class SqlDbMigrator : IDbMigrator
+public sealed class SqlDbMigrator : IDbMigrator
 {
     readonly SqlConnection _connection;
     readonly SqlTransaction _transaction;
@@ -35,7 +35,7 @@ public class SqlDbMigrator : IDbMigrator
         return Task.CompletedTask;
     }
     
-    public async Task EnsureSchemaMigrationTableExistsAsync()
+    public async Task PrepareAsync()
     {
         await _connection.ExecuteNonQueryCommandAsync(Scripts.EnsureMigrationTableExists, transaction: _transaction);
     }

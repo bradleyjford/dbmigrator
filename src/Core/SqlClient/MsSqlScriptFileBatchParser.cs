@@ -8,15 +8,15 @@ public sealed class MsSqlScriptFileBatchParser : IScriptFileBatchParser
 {
     readonly IFileSystem _fileSystem;
 
-    static readonly Regex BatchTerminatorRegex = new Regex(
+    static readonly Regex BatchTerminatorRegex = new(
         @"^[\s]*GO[;\s]*$", 
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline, 
-        TimeSpan.FromSeconds(2));
+        TimeSpan.FromSeconds(1));
 
-    static readonly Regex ParameterRegex = new Regex(
+    static readonly Regex ParameterRegex = new(
         @"\$\((?<name>[^)]+)\)", 
         RegexOptions.Compiled | RegexOptions.IgnoreCase,
-        TimeSpan.FromSeconds(2));
+        TimeSpan.FromSeconds(1));
 
     const int BufferSize = 20 * 1024;
 
@@ -88,7 +88,7 @@ public sealed class MsSqlScriptFileBatchParser : IScriptFileBatchParser
         return result;
     }
     
-    string SubstituteArguments(string script, IDictionary<string, string> arguments)
+    static string SubstituteArguments(string script, IDictionary<string, string> arguments)
     {
         foreach (var argument in arguments)
         {
